@@ -1,0 +1,32 @@
+Type,Name,ParentOU,OU,Scope,GroupType,Username,FullName,Password,Email,Groups
+OU,HQ-Lestlania,,, ,,,, ,,
+OU,STAB,HQ-Lestlania,,, ,,,, ,
+OU,Resources,HQ-Lestlania,,,,,,,,
+OU,G1,STAB,, ,,,, ,,
+OU,G1-users,G1,,,,,,,,
+OU,G1-computers,G1,,,,,,,,
+OU,G2,STAB,,,,,,,,
+OU,G2-users,G2,,,,,,,,
+OU,G2-computers,G2,,,,,,,,
+OU,G3,STAB,,,,,,,,
+OU,G3-users,G3,,,,,,,,
+OU,G3-computer,G3,,,,,,,,
+OU,IT,HQ-Lestlania,,,,,,,,
+OU,IT-users,IT,,,,,,,,
+OU,IT-computers,IT,,,,,,,,
+Group,G1-GRP,,G1,Global,Security,,,,,
+Group,G2-GRP,,G2,Global,Security,,,,,
+Group,G3-GRP,,G3,Global,Security,,,,,
+Group,IT-GRP,,IT-users,Global,Security,,,,,
+Group,HQ-Lestlania-GRP,,HQ-Lestlania,Global,Security,,,,,
+Group,STAB-CH-GRP,,STAB,Global,Security,,,,,
+User,,,G1-users,,,G1-CH,G1-CH,Passw0rd,,G1-GRP
+User,,,G1-users,,,G1-SG,G1-SG,Passw0rd,,G1-GRP
+User,,,G1-users,,,G1-KS,G1-KS,Passw0rd,,G1-GRP
+User,,,G2-users,,,G2-CH,G2-CH,Passw0rd,,G2-GRP
+User,,,G2-users,,,G2-SG,G2-SG,Passw0rd,,G2-GRP
+User,,,G2-users,,,G2-KS,G2-KS,Passw0rd,,G2-GRP
+User,,,G3-users,,,G3-CH,G3-CH,Passw0rd,,G3-GRP
+User,,,G3-users,,,G3-SG,G3-SG,Passw0rd,,G3-GRP
+User,,,G3-users,,,G3-KS,G3-KS,Passw0rd,,G3-GRP
+,,,,,,,,,,
