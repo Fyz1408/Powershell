@@ -1,10 +1,30 @@
 Import-Module ActiveDirectory
 
+# Default DN
 $defaultDN = "DC=CVPL1,DC=dk"
-$csvPath = "C:\PS\CSV\import.csv"
+
+# Resolve script directory
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
+$defaultCsvPath = Join-Path $scriptDir "import.csv"
+
+# Check if CSV exists in the same folder as the script
+if (Test-Path $defaultCsvPath) {
+    $csvPath = $defaultCsvPath
+    Write-Host "CSV found: $csvPath"
+} else {
+    Write-Warning "CSV file not found at default path: $defaultCsvPath"
+    do {
+        $csvPath = Read-Host "Please enter full path to the CSV file"
+        if (-not (Test-Path $csvPath)) {
+            Write-Host "File not found. Please try again." -ForegroundColor Red
+        }
+    } while (-not (Test-Path $csvPath))
+}
+
+# Import data
 $data = Import-Csv -Path $csvPath
 
-# === Cache of full OU DNs ===
+# Cache of full OU DNs
 $ouPaths = @{}
 
 function Resolve-OUPath {
@@ -116,4 +136,4 @@ $data | Where-Object { $_.Type -eq "User" } | ForEach-Object {
     }
 }
 
-Write-Host "`Import complete."
+Write-Host "`nImport complete."
