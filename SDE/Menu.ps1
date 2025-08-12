@@ -124,8 +124,8 @@ function LedigVirtuelHukommelse
 {
     Write-Host 'Henter Ledig virtuel hukommelse'
 
-    #Get-WmiObject -ClassName CIM_OperatingSystem | Format-Table FreeVirtualMemory, TotalVirtualMemorySize, FreePhysicalMemory, TotalVisibleMemorySize
-    systeminfo | find "Virtual Memory"
+    # Get WMI object for CIM_OperatingSystem and format table with free and total virtual memory and free and total physical memory
+    Get-WmiObject -ClassName CIM_OperatingSystem | Format-Table FreeVirtualMemory, TotalVirtualMemorySize, FreePhysicalMemory, TotalVisibleMemorySize
 
     GoBack
 }
