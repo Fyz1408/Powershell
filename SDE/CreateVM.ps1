@@ -43,16 +43,18 @@ function NewVM {
     Clear-Host
     Write-Host "--------------Opret ny virtual maskine----------------" -Foreground Yellow
 
+    # Read user input for VM details
     $vmName = Read-Host "Indtast navnet på den nye virtuelle maskine (fx, VM1)"
     $vmPath = Read-Host "Indtast stien hvor VM'en skal gemmes (fx, D:\Hyper-V)"
     $vSwitch = Read-Host "Indtast navnet på din virtual switch (fx, External Switch)"
     $ISO = Read-Host "Indtast stien til ISO filen(fx, D:\ISO\SRV2022.iso)"
     $cpuCount = Read-Host "Indtast antal CPU'er (fx, 2)"
-    $memorySize = Read-Host "Indtast mængden af ram (fx, 4)"
-    $VHDSize = Read-Host "Indtast mængden af disk plads (fx, 32)"
+    $memorySize = Read-Host "Indtast mængden af ram i GB (fx, 4)"
+    $VHDSize = Read-Host "Indtast mængden af disk plads i GB(fx, 32)"
     
-    $VMMemory  = ($memorySize + "GB") -as [int64]
-    $VHDSizeGB = ($VHDSize + "GB") -as [int64]
+    $memorySize = 1GB * $memorySize
+    $maxiumMemory = $memorySize * 2
+    $VHDSizeGB = 1GB * $VHDSize
   
     $vmFolder = Join-Path $vmPath $vmName
     $vhdPath = Join-Path $vmFolder "$($vmName).vhdx"
@@ -64,7 +66,11 @@ function NewVM {
         New-Item -ItemType Directory -Path $vmFolder | Out-Null
     }
 
-    New-VM -Name $vmName -MemoryStartupBytes $VMMemory -Generation 2 -NewVHDPath $vhdPath -NewVHDSizeBytes $VHDSizeGB
+    # Create the VM
+    New-VM -Name $vmName -Generation 2 -NewVHDPath $vhdPath -NewVHDSizeBytes $VHDSizeGB
+
+    # Set Dynamic Memory
+    Set-VMMemory -VMName $vmName -DynamicMemoryEnabled $true -MinimumBytes 64MB -StartupBytes $memorySize -MaximumBytes $maxiumMemory -Priority 50 -Buffer 25
 
     # Set processor count
     Set-VMProcessor -VMName $vmName -Count $cpuCount

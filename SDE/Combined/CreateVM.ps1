@@ -4,6 +4,7 @@ function GetVMS {
     Clear-Host
     Write-Host "--------------Virtual maskiner----------------" -Foreground Yellow
 
+    # Display all virtual machines with their details
     Get-VM |
     Format-Table name, state, cpu, memory, uptime, status, Version
 
@@ -14,6 +15,7 @@ function NewVM {
     Clear-Host
     Write-Host "--------------Opret ny virtual maskine----------------" -Foreground Yellow
 
+    # Read user input for VM details
     $vmName = Read-Host "Indtast navnet på den nye virtuelle maskine (fx, VM1)"
     $vmPath = Read-Host "Indtast stien hvor VM'en skal gemmes (fx, D:\Hyper-V)"
     $vSwitch = Read-Host "Indtast navnet på din virtual switch (fx, External Switch)"
@@ -22,8 +24,8 @@ function NewVM {
     $memorySize = Read-Host "Indtast mængden af ram (fx, 4)"
     $VHDSize = Read-Host "Indtast mængden af disk plads (fx, 32)"
     
-    $VMMemory  = ($memorySize + "GB") -as [int64]
-    $VHDSizeGB = ($VHDSize + "GB") -as [int64]
+    $memorySize = 1GB * $memorySize
+    $VHDSizeGB = 1GB * $VHDSize
   
     $vmFolder = Join-Path $vmPath $vmName
     $vhdPath = Join-Path $vmFolder "$($vmName).vhdx"
@@ -35,7 +37,11 @@ function NewVM {
         New-Item -ItemType Directory -Path $vmFolder | Out-Null
     }
 
-    New-VM -Name $vmName -MemoryStartupBytes $VMMemory -Generation 2 -NewVHDPath $vhdPath -NewVHDSizeBytes $VHDSizeGB
+    # Create the VM
+    New-VM -Name $vmName -Generation 2 -NewVHDPath $vhdPath -NewVHDSizeBytes $VHDSizeGB
+
+    # Set Dynamic Memory
+    Set-VMMemory -VMName $vmName -DynamicMemoryEnabled $true -MinimumBytes 64MB -StartupBytes 256MB -MaximumBytes $memorySize -Priority 80 -Buffer 25
 
     # Set processor count
     Set-VMProcessor -VMName $vmName -Count $cpuCount
@@ -64,10 +70,12 @@ function RemoveVM {
     Clear-Host
     Write-Host "--------------Slet en Virtual maskine----------------" -Foreground Yellow
 
+    # Display all virtual machines
     Get-VM | Format-Table name, state, cpu, memory, uptime, status, Version
 
     $vmName = Read-Host "Indtast navnet på den virtuelle maskine du vil slette"
 
+    # Delete the specified VM if it exists
     if ((Get-VM -Name $vmName )) {
         Remove-VM $vmName -Force
         Write-Host "VM '$vmName' er blevet slettet." -ForegroundColor Green

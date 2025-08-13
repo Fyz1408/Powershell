@@ -1,7 +1,6 @@
 # Import modules and scripts
-. $PSScriptRoot\ServerSetup
-. $PSScriptRoot\CreateVM
 . $PSScriptRoot\Tools
+. $PSScriptRoot\ServerInfo
 
 function CombinedMenu() {
     do {
@@ -10,14 +9,15 @@ function CombinedMenu() {
             #----------------------------------------------------------#
             #                 Server Setup Menu                        #
             #                                                          #
-            #   1. Vis Computer information                            #
+            #   1. Vis Computer information (OS, Domæne, Tidszone)     #
             #   2. Vis Ip information                                  #
             #   3. Vis Shares                                          #
             #   4. Vis Services                                        #
             #   5. Vis sidste genstart                                 #
             #   6. Vis Virtual maskiner                                #
             #   7. Opret ny virtual maskine                            #
-            #   8. Slet en virtuel maskine                             #       
+            #   8. Opret ny virtual maskine fra liste                  #
+            #   9. Slet en virtuel maskine                             #       
             #                                                          #
             #   0. Luk menu                                            #
             #----------------------------------------------------------#"
