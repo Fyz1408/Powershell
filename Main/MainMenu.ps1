@@ -9,8 +9,8 @@ function CombinedMenu() {
             #----------------------------------------------------------#
             #                 Server Setup Menu                        #
             #                                                          #
-            #   1. Vis Computer information (OS, Domæne, Tidszone)     #
-            #   2. Vis Ip information                                  #
+            #   1. Vis Computer information (OS, Domæne, Tidszone..)   #
+            #   2. Vis Ip information (IP, Subnet, DNS...)             #
             #   3. Vis Shares                                          #
             #   4. Vis Services                                        #
             #   5. Vis sidste genstart                                 #
@@ -18,9 +18,11 @@ function CombinedMenu() {
             #   7. Opret ny virtual maskine                            #
             #   8. Opret ny virtual maskine fra liste                  #
             #   9. Slet en virtuel maskine                             #       
+            #   10. Opret OU, Brugere & Grupper fra csv                #       
+            #   11. Opsæt Hostname, IP, Tidszone                       #       
             #                                                          #
             #   0. Luk menu                                            #
-            #----------------------------------------------------------#"
+            #----------------------------------------------------------#" -ForegroundColor Yellow
             
         $menu = read-host "Indtast"
 
