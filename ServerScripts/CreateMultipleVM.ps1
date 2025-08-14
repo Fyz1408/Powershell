@@ -6,7 +6,7 @@ $win10ISO = Read-Host "Enter path to Windows 10 ISO (e.g., D:\ISO\WIN10.iso)"
 
 # Define Host1 VM settings
 $host1 = @(
-    @{ Name = "DC02";     MemoryStartupBytes = 4GB;  VHDSizeGB = 50;  ISO = $winServerISO; CPUCount = 2 },
+    @{ Name = "DC01";     MemoryStartupBytes = 4GB;  VHDSizeGB = 50;  ISO = $winServerISO; CPUCount = 2 },
     @{ Name = "DFS01";    MemoryStartupBytes = 4GB;  VHDSizeGB = 50;  ISO = $winServerISO; CPUCount = 4 },
     @{ Name = "DHCP-01";  MemoryStartupBytes = 4GB;  VHDSizeGB = 50;  ISO = $winServerISO; CPUCount = 2 },
     @{ Name = "EX-01";    MemoryStartupBytes = 16GB; VHDSizeGB = 200; ISO = $winServerISO; CPUCount = 4 }
