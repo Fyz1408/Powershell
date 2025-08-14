@@ -1,6 +1,13 @@
+# Ensure script is run as Administrator
+if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(
+    [Security.Principal.WindowsBuiltInRole] "Administrator")) {
+    Write-Error "Scriptet skal køres som administrator"
+    exit 1
+}
+
 # Ensure ImportExcel is available
 if (-not (Get-Module -ListAvailable -Name ImportExcel)) {
-    Write-Host "ImportExcel module not found. Installing..." -ForegroundColor Yellow
+    Write-Host "ImportExcel module not found. Installing..." 
     try {
         Install-Module -Name ImportExcel -Scope CurrentUser -Force -ErrorAction Stop
         Write-Host "ImportExcel module installed successfully." -ForegroundColor Green
@@ -11,12 +18,113 @@ if (-not (Get-Module -ListAvailable -Name ImportExcel)) {
     }
 }
 
+function Get-ServerInfo {
+    # Host basic info
+    $hostname      = $env:COMPUTERNAME
+    $domain        = (Get-WmiObject Win32_ComputerSystem).Domain
+    $timezone      = (Get-TimeZone).DisplayName
+    $lastBootTime  = (Get-CimInstance Win32_OperatingSystem).LastBootUpTime
+    $os            = (Get-CimInstance Win32_OperatingSystem).Caption
+    $uptime        = (Get-Date) - $lastBootTime
+
+    # Network details from the primary active adapter
+    $primaryAdapter = Get-NetIPConfiguration |
+        Where-Object { $_.IPv4DefaultGateway -ne $null -and $_.NetAdapter.Status -eq "Up" } |
+        Select-Object -First 1
+
+    $ip        = $primaryAdapter.IPv4Address.IPAddress
+    $subnet    = $primaryAdapter.IPv4Address.PrefixLength
+    $gateway   = $primaryAdapter.IPv4DefaultGateway.NextHop
+    $dns       = $primaryAdapter.DnsServer.ServerAddresses -join ", "
+
+    # Virtual machines
+    $vms = (Get-VM | Select-Object -ExpandProperty Name)
+
+    return @{
+        Hostname     = $hostname
+        Domain       = $domain
+        OS           = $os
+        IP           = $ip
+        Subnet       = $subnet
+        Gateway      = $gateway
+        DNS          = $dns
+        TimeZone     = $timezone
+        LastBootTime = $lastBootTime
+        Uptime       = ("{0:%d} dage {0:hh} timer {0:mm} minutter" -f $uptime)
+        VMs          = $vms
+    }
+}
+
+
 function GoBack {
-    Write-Host 'Tryk enter for at gå tilbage' -NoNewline -ForegroundColor Yellow
+    Write-Host 'Tryk enter for at gå tilbage' -NoNewline 
     Read-Host
 }
 
 function CloseMenu {
     Clear-Host
     Write-Host "Lukker menu..." -ForegroundColor Green
+}
+
+function AsciiGoat {
+    Write-Host "
+        
+
+                  @@@@@@@@@@@                                          @@@@@@@@@@@                  
+              @@@*************@@@                                  @@@*************@@@              
+            @@*******************%@@                            @@#*******************@@            
+          @@********#%#*************@@                        @@*************%%#*******#@           
+         @@***#@@@@     @@@***********@@                    @@***********@@@     @@@@****@@         
+        @@**@@             @@**********#@                 @@***********@@            @@@**@         
+        @#@@                @@***********@               @@***********@@                @@%@        
+       @@@                   @%***********@@@@@@@@@@@@@@@@***********@@                  @@@        
+       @@                    @@***********@@------------@%***********@                     @@       
+                              @***********@@------------@%**********%@                              
+                              @@*********@@--------------@%*********@@                              
+                            @@-@@******@@-----------------+@@******@@@@                             
+                       @@@@@-----=@@@+------------------------*@@@=----@@@@@                        
+                  @@@@-------------------------------------------------------@@@@                   
+                @@--------------------------------------------------------------=@@                 
+             @@@-------------------------------------------------------------------@@               
+            @@----------------------%@@@@@@@*---------#@@@@@@@%----------------------@@             
+           @@@%------@@-----------@@        .@@-----@@         @@----------=@#------@@@@            
+                @@@@@@@----------@:           #@---@+           =@----------@@@@@@@                 
+                  @@-@*---------@#             @@-@@             @@---------@@=@                    
+                 @@--@----------@       @@@@=  +@-@-  .@@@@      -@---------*@--@@                  
+                @@---@----------@*      @@@@@  @@-@%  @@@@@.     %@---------+@---@@                 
+               @@----@-----------@      .@@@  -@---@.  %@@.     .@---------++@----@@                
+              @@-----@------------@@         @@-----@@         @@----------++@-----@@               
+              @------@--------------@@@@%@@@@---------@@@@%@@@@-----------++*@------@               
+             @+------@@--------------------------------------------------+++@%=-----%@              
+            @@--------@-------------------------------------------------++++@+-------@@             
+            @+--------*@=----------------------------------------------++++@++-------%@             
+            @----------%@+--------------------------------------------++++@#+=------=+@             
+           @@-----------%@++----------------------------------------+++++@#++-------++@@            
+           @@------------+@++=------------------------------------+++++*@+++--------++@@            
+           @#-------------+@@+++-----------#@@@-----@@@#--------++++++@@+++--------+++@@            
+           @#--------------++@%+++----------@@@@---@@@@-------++++++%@++++---------+++@@            
+           @@---------------++*@%++++--------@@-----@@-----+++++++%@+++++---------++++@@            
+           @@-----------------+++@@+++++=--------------+++++++++@@+++++----------+++++@@            
+            @+------------------+++@@#+++++++++==++++++++++++#@@+++++-----------=+++++@             
+            @#+-------------------++++@@@+++++++++++++++++@@@++++++------------=+++++%@             
+            @@++--------------------+++@@%@@@*+++++++*@@@%@@+++++-------------+++++++@@             
+             @#++=---------------------+@#****#@@@@@#****#@+++---------------+++++++@@              
+              @++++----------------------@**#@********@**@#----------------=++++++++@               
+              @@+++++--------------------@@*@@*******@@@#@*---------------+++++++++@@               
+               @@++++++------------------@@@-@#******@--@@@-------------++++++++++@@                
+                @@+++++++--------------------@@**@@@*@---------------=+++++++++++@@                 
+                 @@+++++++++-----------------=@*#@-@@@@------------+++++++++++++@@                  
+                   @+++++++++++---------------@*@#--#@@--------=++++++++++++++#@                    
+                    @@+++++++++++++=----------@@@-----@@---++++++++++++++++++@@                     
+                      @%+++++++++*@@@%++++++==+@@=+++++++++++#@@@#+++++++++@@                       
+                       @@%+++@@@#******%@@*++++%+++++++++@@@*******@@@+++@@                         
+                          @@@**************@%++++++++++@@*************@@@                           
+                          @*******@#********%@+++++++@@*********@#******@@                          
+                         @*******@@**********%@+++++%@**********@@@******@@                         
+                        @@******@@@***********@#++++@***********#@@#******@                         
+                        @******@@@%***********@@@@@@@************@%@******@@                        
+                        @@*****@#@#***********@@    @#***********@#@*****#@                         
+                          @@@@@@@@@@@@@@@@@@@@        @@@@@@@@@@@@@@@@@@@@                          
+
+        " -ForegroundColor Cyan
 }

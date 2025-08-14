@@ -104,6 +104,8 @@ function RemoveVM {
     $vmName = Read-Host "Indtast navnet på den virtuelle maskine du vil slette"
 
     if ((Get-VM -Name $vmName )) {
+        $path = (Get-VM -Name $vmName | Select-Object path).Path + "\$vmName" 
+        Remove-Item "$path" -Force
         Remove-VM $vmName -Force
         Write-Host "VM '$vmName' er blevet slettet." -ForegroundColor Green
     } else {

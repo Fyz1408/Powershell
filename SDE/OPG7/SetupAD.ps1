@@ -2,12 +2,16 @@
 . "$PSScriptRoot\General.ps1"
 Import-Module ImportExcel -ErrorAction Stop
 
+# Default Domain 
 $defaultDN = "DC=CVPL1,DC=dk"
+
+# Cache of full OU DNs
+$ouPaths = @{}
 
 # Initial Create function to retrieve the excel, also display the data to let the user verify its correct
 Function CreateAD {
     Clear-Host
-    Write-Host 'Henter Excel ark' -ForegroundColor Yellow
+    Write-Host 'Henter Excel ark'
 
     $data = Import-Excel "$PSScriptRoot\AD.xlsx"   
     $data | Format-Table 
@@ -19,13 +23,13 @@ Function CreateAD {
     0: Gå tilbage
     1: Opret OU, Brugere og grupper udfra Excel arket
     2: Slet OU, Brugere og grupper udfra Excel arket
-    " -ForegroundColor Yellow
+    "
 
     $verify = Read-Host
 
     switch ($verify) {
         1 { CreateADFromExcel($data) }
-        2 { CleanUpADFromExcel($datas) }
+        2 { CleanUpADFromExcel($data) }
         Default { CloseMenu }
     }
 }
@@ -60,9 +64,7 @@ Function CreateADFromExcel {
     param ($excel)
 
     begin {
-        Write-Host "Opretter OU, Grupper & Brugere" -ForegroundColor Yellow
-        # Cache of full OU DNs
-        $ouPaths = @{}
+        Write-Host "Opretter OU, Grupper & Brugere"
     }
 
     process {
@@ -90,7 +92,7 @@ Function CreateADFromExcel {
             $ouName = $_.OU
 
             if (-not $ouName) {
-                Write-Host "Group '$groupName' missing OU info, skipping." -ForegroundColor Yellow
+                Write-Host "Group '$groupName' missing OU info, skipping."
                 return
             }
 
@@ -112,7 +114,7 @@ Function CreateADFromExcel {
             $ouName = $_.OU
 
             if (-not $ouName) {
-                Write-Host "User '$username' missing OU info, skipping." -ForegroundColor Yellow
+                Write-Host "User '$username' missing OU info, skipping."
                 return
             }
 
@@ -160,7 +162,7 @@ Function CreateADFromExcel {
     end {
         Write-Host "-----------------------------------------------" -ForegroundColor Green
         Write-Host "Oprettelse færdig" -ForegroundColor Green
-        Write-Host "Tast enter for at gå tilbage til hovedmenuen" -ForegroundColor Yellow -NoNewline
+        Write-Host "Tast enter for at gå tilbage til hovedmenuen" -NoNewline
         Read-Host
     }
 }
@@ -169,7 +171,7 @@ Function CleanUpADFromExcel {
     param ($excel)
 
     begin {
-        Write-Host "Begynder sletning.." -ForegroundColor Yellow
+        Write-Host "Begynder sletning.."
     }
 
     process {
@@ -237,7 +239,7 @@ Function CleanUpADFromExcel {
     end {
         Write-Host "-----------------------------------------------" -ForegroundColor Green
         Write-Host "Sletning færdig" -ForegroundColor Green
-        Write-Host "Tast enter for at gå tilbage til hovedmenuen" -ForegroundColor Yellow -NoNewline
+        Write-Host "Tast enter for at gå tilbage til hovedmenuen"  -NoNewline
         Read-Host
     }
 }
